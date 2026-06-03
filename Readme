@@ -1,0 +1,292 @@
+# AWS Serverless Registration Form Project
+
+## Project Overview
+
+This project demonstrates a complete serverless web application using AWS services.
+
+### Technologies Used
+
+* HTML/CSS (Frontend)
+* Amazon API Gateway
+* AWS Lambda (Python)
+* Amazon DynamoDB
+* IAM Roles
+* Boto3 SDK
+
+---
+
+## Architecture Diagram
+
+```text
+┌─────────────────────┐
+│      End User       │
+│    Web Browser      │
+└──────────┬──────────┘
+           │
+           │ GET / POST
+           ▼
+┌─────────────────────┐
+│    API Gateway      │
+│    Stage : dev      │
+└──────────┬──────────┘
+           │
+           │ Invoke Lambda
+           ▼
+┌─────────────────────┐
+│    AWS Lambda       │
+│   Python Backend    │
+└──────────┬──────────┘
+           │
+           │ Boto3 SDK
+           ▼
+┌─────────────────────┐
+│     DynamoDB        │
+│  Table : student    │
+│ PK : student_id     │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│   Success Page      │
+└─────────────────────┘
+```
+
+---
+
+## Request Flow
+
+### Step 1: User Opens Application
+
+The user accesses the API Gateway URL:
+
+```text
+https://<api-id>.execute-api.ap-south-1.amazonaws.com/dev
+```
+
+Browser sends:
+
+```http
+GET /dev
+```
+
+---
+
+### Step 2: API Gateway Invokes Lambda
+
+API Gateway receives the request and triggers the Lambda function.
+
+```text
+Browser
+   │
+   ▼
+API Gateway
+   │
+   ▼
+Lambda
+```
+
+---
+
+### Step 3: Lambda Returns Frontend
+
+Lambda reads the `index.html` file and returns it to the browser.
+
+```python
+if httpmethod == 'GET':
+    with open('index.html','r') as htmlFile:
+        htmlContent = htmlFile.read()
+```
+
+The registration form is displayed to the user.
+
+---
+
+### Step 4: User Submits Form
+
+Frontend Form:
+
+```html
+<form action="/dev" method="post">
+```
+
+User enters:
+
+* First Name
+* Last Name
+* Email
+* Message
+
+and clicks Submit.
+
+---
+
+### Step 5: Browser Sends POST Request
+
+```http
+POST /dev
+```
+
+The form data is sent to API Gateway.
+
+---
+
+### Step 6: API Gateway Triggers Lambda Again
+
+API Gateway receives the POST request and invokes Lambda.
+
+```text
+Browser
+   │ POST /dev
+   ▼
+API Gateway
+   │
+   ▼
+Lambda
+```
+
+---
+
+### Step 7: Lambda Processes Data
+
+Lambda receives the form data and executes:
+
+```python
+insert_record(formbody)
+```
+
+---
+
+### Step 8: Lambda Communicates with DynamoDB
+
+Lambda uses the Boto3 SDK:
+
+```python
+client = boto3.client('dynamodb')
+```
+
+The Lambda execution role automatically provides temporary AWS credentials.
+
+---
+
+### Step 9: DynamoDB Stores Record
+
+Data is inserted into:
+
+```text
+Table Name : student
+Partition Key : student_id
+```
+
+Example Item:
+
+```json
+{
+  "student_id": "12345",
+  "fname": "Ravina",
+  "lname": "Rathod",
+  "email": "ravina@gmail.com",
+  "message": "Interested in DevOps"
+}
+```
+
+---
+
+### Step 10: Success Response
+
+After successful insertion:
+
+```text
+DynamoDB
+   │
+   ▼
+Lambda
+   │
+   ▼
+success.html
+   │
+   ▼
+API Gateway
+   │
+   ▼
+Browser
+```
+
+The user receives a confirmation page.
+
+---
+
+## Complete End-to-End Flow
+
+```text
+User
+ │
+ ▼
+GET /dev
+ │
+ ▼
+API Gateway
+ │
+ ▼
+Lambda
+ │
+ ▼
+index.html
+ │
+ ▼
+User fills form
+ │
+ ▼
+POST /dev
+ │
+ ▼
+API Gateway
+ │
+ ▼
+Lambda
+ │
+ ▼
+Boto3 SDK
+ │
+ ▼
+DynamoDB (student)
+ │
+ ▼
+success.html
+ │
+ ▼
+Browser
+```
+
+---
+
+## Key Learnings
+
+* API Gateway acts as the public entry point.
+* Stage (`dev`) is an environment and routing mechanism, not a database.
+* Lambda contains the application logic.
+* Boto3 is used to communicate with DynamoDB.
+* IAM Roles provide secure permissions to Lambda.
+* DynamoDB requires the partition key (`student_id`) in every item.
+* The architecture is completely serverless and highly scalable.
+
+---
+
+## AWS Services Used
+
+1. Amazon API Gateway
+2. AWS Lambda
+3. Amazon DynamoDB
+4. AWS IAM
+5. Amazon CloudWatch
+6. Boto3 SDK
+
+---
+
+## Serverless Architecture Benefits
+
+* No server management
+* Automatic scaling
+* Pay only for usage
+* High availability
+* Reduced operational overhead
+* Easy integration between AWS services
