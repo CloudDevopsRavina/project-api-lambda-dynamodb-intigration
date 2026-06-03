@@ -1,7 +1,14 @@
 AWS Lambda communicates with DynamoDB using the Boto3 SDK. When the Lambda function executes, it assumes an IAM execution role that provides temporary credentials. Using these credentials, Lambda sends HTTPS API requests to DynamoDB. DynamoDB validates the IAM permissions, processes the request, stores the data in the table, and returns a response back to Lambda. Lambda then sends the final response to API Gateway, which returns it to the user.
 
-A clean architecture diagram for your project would look like this:
+# AWS Serverless Registration Application
 
+## Project Overview
+
+This project demonstrates a complete serverless web application built using AWS services. Users can register through a web form, and their details are securely stored in DynamoDB using AWS Lambda and API Gateway.
+
+## Architecture Diagram
+
+```text
 ┌─────────────────────┐
 │      End User       │
 │  (Web Browser)      │
@@ -50,77 +57,144 @@ A clean architecture diagram for your project would look like this:
 │ "Registration       │
 │ Successful" Page    │
 └─────────────────────┘
-Detailed Request Flow
-1. User opens website
-   │
-   ▼
-2. API Gateway receives GET request
-   │
-   ▼
-3. Lambda reads index.html
-   │
-   ▼
-4. Registration Form displayed
+```
 
-------------------------------------------------
+---
 
-5. User enters details and clicks Submit
-   │
-   ▼
-6. Browser sends POST request
-   │
-   ▼
-7. API Gateway triggers Lambda
-   │
-   ▼
-8. Lambda extracts form data
-   │
-   ▼
-9. Lambda uses Boto3
-      client = boto3.client('dynamodb')
-   │
-   ▼
-10. IAM Role provides permissions
-   │
-   ▼
-11. DynamoDB stores record
-   │
-   ▼
-12. DynamoDB returns success
-   │
-   ▼
-13. Lambda loads success.html
-   │
-   ▼
-14. API Gateway returns response
-   │
-   ▼
-15. User sees confirmation page
-AWS Services Communication
+# Detailed Request Flow
+
+### Step 1: User Opens Website
+
+1. User opens the application URL.
+2. Browser sends a GET request.
+3. API Gateway receives the request.
+4. API Gateway invokes Lambda.
+5. Lambda reads `index.html`.
+6. Registration form is displayed to the user.
+
+---
+
+### Step 2: User Submits Registration Form
+
+1. User enters:
+
+   * First Name
+   * Last Name
+   * Email
+   * Message
+
+2. User clicks Submit.
+
+3. Browser sends a POST request.
+
+4. API Gateway receives the request.
+
+5. API Gateway invokes Lambda.
+
+6. Lambda extracts form data from the request body.
+
+7. Lambda creates a DynamoDB client using Boto3:
+
+```python
+client = boto3.client('dynamodb')
+```
+
+8. Lambda assumes its IAM Execution Role.
+
+9. AWS automatically provides temporary credentials.
+
+10. Lambda sends an HTTPS API request to DynamoDB.
+
+11. DynamoDB validates permissions.
+
+12. DynamoDB stores the record in the `veera` table.
+
+13. DynamoDB returns a success response.
+
+14. Lambda loads `success.html`.
+
+15. API Gateway returns the success page to the browser.
+
+16. User sees the confirmation page.
+
+---
+
+# AWS Services Communication
+
+```text
                 AWS Cloud
+
 ┌─────────────────────────────────────┐
 
-    API Gateway
-         │
-         ▼
-    AWS Lambda
-         │
-         │ IAM Role
-         ▼
-      Boto3 SDK
-         │
-         │ HTTPS API
-         ▼
-      DynamoDB
+               API Gateway
+                    │
+                    ▼
+               AWS Lambda
+                    │
+                    │ IAM Role
+                    ▼
+                 Boto3 SDK
+                    │
+                    │ HTTPS API
+                    ▼
+                 DynamoDB
 
 └─────────────────────────────────────┘
-Interview Explanation
+```
 
-When the user submits the registration form, API Gateway invokes the Lambda function. Lambda processes the form data and uses the Boto3 SDK to call DynamoDB APIs. AWS automatically provides temporary credentials through the Lambda execution IAM role. DynamoDB validates the permissions, stores the record in the veera table, and returns a success response. Lambda then returns success.html through API Gateway back to the user's browser.
+---
+
+# How Lambda Communicates with DynamoDB
+
+AWS Lambda communicates with DynamoDB using the Boto3 SDK.
+
+The communication process is:
+
+1. Lambda receives the request from API Gateway.
+2. Lambda processes the user data.
+3. Lambda creates a DynamoDB client using Boto3.
+4. AWS automatically provides temporary credentials through the Lambda Execution Role.
+5. Lambda sends HTTPS API requests to DynamoDB.
+6. DynamoDB validates IAM permissions.
+7. DynamoDB stores the item and returns a response.
+8. Lambda returns the final response to API Gateway.
+
+No Access Keys or Secret Keys are required inside the Lambda code.
+
+---
+
+# AWS Services Used
+
+| Service     | Purpose                                   |
+| ----------- | ----------------------------------------- |
+| HTML/CSS    | Frontend User Interface                   |
+| API Gateway | Entry Point for HTTP Requests             |
+| AWS Lambda  | Serverless Compute Layer                  |
+| DynamoDB    | NoSQL Database                            |
+| IAM Role    | Secure Authorization                      |
+| Boto3 SDK   | Communication Between Lambda and DynamoDB |
+
+---
+
+# Key Learning Outcomes
+
+* Serverless Architecture Design
+* API Gateway Integration with Lambda
+* DynamoDB Data Storage
+* IAM Roles and Permissions
+* Boto3 SDK Usage
+* Frontend and Backend Integration
+* AWS Security Best Practices
+
+---
+
+# Interview Explanation
+
+When the user submits the registration form, API Gateway invokes the Lambda function. Lambda processes the form data and uses the Boto3 SDK to call DynamoDB APIs. AWS automatically provides temporary credentials through the Lambda execution IAM role. DynamoDB validates the permissions, stores the record in the `veera` table, and returns a success response. Lambda then returns `success.html` through API Gateway back to the user's browser.
 
 This is a classic Serverless Architecture using:
 
-API Gateway (Entry Point)
-AWS Lambda (Compute Layer)
-DynamoDB (Database Layer)
-HTML/CSS (Frontend Layer)
+* API Gateway (Entry Point)
+* AWS Lambda (Compute Layer)
+* DynamoDB (Database Layer)
+* HTML/CSS (Frontend Layer)
