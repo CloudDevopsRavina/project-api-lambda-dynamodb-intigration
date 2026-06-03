@@ -198,3 +198,5 @@ This is a classic Serverless Architecture using:
 * AWS Lambda (Compute Layer)
 * DynamoDB (Database Layer)
 * HTML/CSS (Frontend Layer)
+  <img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/47aff22e-27d5-48d5-8c63-12adeff10f4a" />
+
